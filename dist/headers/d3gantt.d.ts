@@ -19,7 +19,7 @@ declare module d3 {
         parent?: number;
     }
     interface IGanttTree extends IGanttData {
-        children: Array<IGanttData>;
+        children?: Array<IGanttData>;
     }
     interface IConfig {
         selector: string;
@@ -37,12 +37,17 @@ declare module d3 {
         private x;
         private xAxis;
         private color;
+        private vLine;
         private start;
         private end;
         private U;
+        private data;
+        private eventsMap;
+        private firstCollumnWidth;
+        private margins;
         constructor(config: IConfig);
         private update();
         fromArray(data: Array<IGanttData>): void;
-        fromTree(data: IGanttTree): void;
+        on(key: string, callback: (item: any) => void): void;
     }
 }

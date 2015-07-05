@@ -6,8 +6,10 @@
 	<style>
 		#container{
 			width: 800px;
-			height: 500px;
+			height: 400px;
 			border : 1px purple solid;
+			position: relative;
+			margin: 3em 1em
 		}
 		.axis path,
 		.axis line {
@@ -18,16 +20,32 @@
 		}
 		#container svg{
 			box-shadow: 0 0 0.5em gray;
+			position: absolute;
+			z-index: 0;
+			top:0;
 		}
 		#container .ganttContainer {
 			overflow: scroll;
 		}
+		#container table{
+			position: absolute;
+			z-index: 1;
+			top:0;
+			margin-top: 35px
+		}
+		#container table td{
+			border-bottom: 1px gray solid;
+		}
+		#tooltip{
+			position: absolute;
+			z-index: 1;
+		}
 	</style>
 	<body>
 		
-		<div id="container">
-			
-		</div>
+		
+		<div id="container"></div>
+		<div id="tooltip"></div>
 		
 		<script src="bower_components/d3/d3.js"></script>
 		<script src="dist/js/d3gantt.js"></script>
@@ -37,7 +55,48 @@
 			var config = {
 				selector : "#container"
 			}
-			var Gantt = d3.Gantt(config);
+			var Gantt = new d3.Gantt(config);
+			
+			var start = new Date();
+			start.setMilliseconds(start.getMilliseconds()-150);
+			var end = new Date();
+			end.setMilliseconds(end.getMilliseconds()+125);
+			
+			var start2 = new Date();
+			start2.setMilliseconds(start2.getMilliseconds()-111);
+			var end2 = new Date();
+			end2.setMilliseconds(end2.getMilliseconds()+125);
+			
+			var data = [
+				{
+					start : start,
+					end:end,
+					group : "test1",
+					label : "Item1Item1Item1Item1Item1Item1Item1",
+					description : "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reprehenderit nisi ipsam recusandae dolorem. In nulla porro adipisci labore, impedit totam, ipsum a, repellat odio hic cumque amet beatae fuga, tempora."
+				},
+				{
+					start : start2,
+					end:end2,
+					group : "test2"
+				},
+			]
+			
+			Gantt.fromArray(data);
+			
+			
+			
+			var tooltip = document.getElementById('tooltip');
+			Gantt.on('mouseover', function (data) {
+				tooltip.style.display = "block";
+				tooltip.innerHTML = data.label + "<br/>" + data.description;
+				tooltip.style.left = window.event.clientX + "px";
+				tooltip.style.top = window.event.clientY + "px";
+			});
+			
+			Gantt.on('mouseleave', function () {
+				tooltip.style.display = "none";
+			});
 			
 		</script>
 	</body>
