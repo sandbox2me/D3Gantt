@@ -1,0 +1,25 @@
+{
+  "name": "D3Gantt",
+  "version": "0.0.1",
+  "description": "A d3js gantt diagram",
+  "main": "index.js",
+  "dependencies": {
+    "gulp": "^3.9.0",
+    "gulp-typescript": "^2.7.8",
+    "merge2": "^0.3.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ggeoffrey/D3Gantt.git"
+  },
+  "author": "Geoffrey Gaillard",
+  "license": "CC CC-BY-SA",
+  "bugs": {
+    "url": "https://github.com/ggeoffrey/D3Gantt/issues"
+  },
+  "homepage": "https://github.com/ggeoffrey/D3Gantt"
+}
