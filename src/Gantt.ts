@@ -38,9 +38,10 @@ module d3{
 		private $container : Selection<any>;
 		
 		
-		private x : d3.time.Scale<number, number>;
+		private x ;
 		private xAxis : d3.svg.Axis;
 		private color : d3.scale.Ordinal<string, string>;
+		private zoom : d3.behavior.Zoom<any>;
 		
 		private vLine : Selection<any>;
 		
@@ -54,7 +55,7 @@ module d3{
 		private data : Array<IGanttData>;
 		private eventsMap : {[index : string] : Function};
 		
-		private firstCollumnWidth = 100;
+		
 		private margins = {
 			top : 0,
 			left : 0,
@@ -76,13 +77,28 @@ module d3{
 			
 			this.svgHeight = height;
 	
-			this.x = d3.time.scale().range([0,width-this.firstCollumnWidth-this.margins.right]);
+			this.x = d3.time.scale().range([0,width-this.margins.right]);
 			
 			this.xAxis = d3.svg.axis().scale(this.x)
     			.orient("top").ticks(10);
 				
 			this.color = d3.scale.category20();
 			
+			this.zoom = d3.behavior.zoom()
+						
+					    .on("zoom", (d, i)=>{
+							this.zoom.x(this.x)
+							this.$elem.selectAll('.x.axis').call(this.xAxis);
+							this.$container.selectAll('.rect')
+								.style("margin-left", (d)=>{
+									return this.x(d.start)  + 'px'; 
+								})
+								.style("width", (d)=>{
+									var w = this.x(d.end) - this.x(d.start);
+									w<1 ? w=1 : null ;
+									return w + 'px';
+								});
+						});
 			
 			
 			this.$svg = this.$elem.append("svg")
@@ -90,7 +106,7 @@ module d3{
 							.attr('height', this.svgHeight)
 							.append("g")
 					        .attr("class", "x axis")
-					        .attr("transform", "translate("+(this.firstCollumnWidth+1)+", 30)")
+					        .attr("transform", "translate(0, 30)")
 					        .call(this.xAxis)
 							;
 			
@@ -105,14 +121,70 @@ module d3{
 								  .style("width", "100%")
 								  .style("border-collapse", "collapse")
 								  ;
-
+								  
+			this.$container.call(this.zoom);	
+								  
+			
 			this.vLine = this.$svg.append("path") // CONTINUE HERE
 		}
 		
 		private update(){
 			if(this.data){
 				
+				this.$elem.selectAll('.x.axis').call(this.xAxis);
 				
+				var bound = this.$container.selectAll("tr")
+											.data(this.data)
+											;
+											
+				var tr = bound.enter()
+					 .append('tr')
+					 ;
+					 
+				
+				var rect  = tr.append('td')
+							  .style("padding", "0")
+							  .append('div')
+							  .attr('class','rect')
+							  .style('display','inline-block')
+							  ;
+
+				rect.style("margin-left", (d)=>{return this.x(d.start)  + 'px'; });
+				rect.style("width", (d)=>{return this.x(d.end) - this.x(d.start) + 'px';});
+				rect.style("height", "2.5em");
+				
+				rect.style("background-color", (d)=>{return this.color(d.group)});
+				
+				
+				rect.append('div').text((d)=>{ return d.label; })
+									.style("overflow", "hidden")
+									.style("text-overflow", "ellipsis");
+				rect.append('div').text((d)=>{ return d.group; })
+									.style("overflow", "hidden")
+									.style("text-overflow", "ellipsis");
+				
+				var self = this;
+				rect.on('mouseover', function(item){
+					if(self.eventsMap['mouseover']){
+						self.eventsMap['mouseover'](item);
+					}
+				});
+				
+				rect.on('mouseleave', function(){
+					if(self.eventsMap['mouseleave']){
+						self.eventsMap['mouseleave']();
+					}
+				});
+								
+				
+				bound.exit().remove();		
+			}
+		}
+		
+		public fromArray(data : Array<IGanttData>) : void {
+			this.data = data;
+			
+			if (data){
 				var min = d3.min(this.data, (d)=>{
 					return d.start;
 				});
@@ -129,63 +201,7 @@ module d3{
 				
 				this.x.domain([inf, sup]);
 				this.$elem.selectAll('.x.axis').call(this.xAxis);
-				
-				var bound = this.$container.selectAll("tr")
-											.data(this.data)
-											;
-											
-				var tr = bound.enter()
-					 .append('tr')
-					 ;
-					 
-				tr.append('td')
-					.style("width", "100px")
-					.append('div')
-					.attr('title', (d)=>{ return d.group})
-					.style({
-						'width' : '100%',
-						overflow : 'hidden',
-						'text-overflow' : 'ellipsis',
-						'border-right': "1px gray solid"
-						
-					})
-					.text((d)=>{ return d.group});
-				
-				var rect  = tr.append('td')
-							  .style("padding", "0")
-							  .append('div')
-							  .style('display','inline-block')
-							  ;
-
-				rect.style("margin-left", (d)=>{return this.x(d.start)  + 'px'; });
-				rect.style("width", (d)=>{return this.x(d.end) - this.x(d.start) + 'px';});
-				rect.style("height", "20px");
-				
-				rect.style("background-color", (d)=>{return this.color(d.group)});
-				rect.style("overflow", "hidden");
-				rect.style("text-overflow", "ellipsis");
-				
-				rect.text((d)=>{ return d.label });
-				
-				var self = this;
-				rect.on('mouseover', function(item){
-					if(self.eventsMap['mouseover']){
-						self.eventsMap['mouseover'](item);
-					}
-				});
-				
-				rect.on('mouseleave', function(){
-					if(self.eventsMap['mouseleave']){
-						self.eventsMap['mouseleave']();
-					}
-				});
-								
-				bound.exit().remove();					
 			}
-		}
-		
-		public fromArray(data : Array<IGanttData>) : void {
-			this.data = data;
 			
 			
 			this.update();

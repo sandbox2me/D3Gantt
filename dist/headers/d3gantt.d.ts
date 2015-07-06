@@ -37,13 +37,13 @@ declare module d3 {
         private x;
         private xAxis;
         private color;
+        private zoom;
         private vLine;
         private start;
         private end;
         private U;
         private data;
         private eventsMap;
-        private firstCollumnWidth;
         private margins;
         constructor(config: IConfig);
         private update();
