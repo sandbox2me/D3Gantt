@@ -78,10 +78,10 @@ var d3;
                 });
                 var rect = tr.append('td').style("padding", "0").append('div').style('display', 'inline-block');
                 rect.style("margin-left", function (d) {
-                    return _this.x(d.start);
+                    return _this.x(d.start) + 'px';
                 });
                 rect.style("width", function (d) {
-                    return _this.x(d.end) - _this.x(d.start);
+                    return _this.x(d.end) - _this.x(d.start) + 'px';
                 });
                 rect.style("height", "20px");
                 rect.style("background-color", function (d) {

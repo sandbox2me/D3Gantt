@@ -157,8 +157,8 @@ module d3{
 							  .style('display','inline-block')
 							  ;
 
-				rect.style("margin-left", (d)=>{return this.x(d.start)});
-				rect.style("width", (d)=>{return this.x(d.end) - this.x(d.start)});
+				rect.style("margin-left", (d)=>{return this.x(d.start)  + 'px'; });
+				rect.style("width", (d)=>{return this.x(d.end) - this.x(d.start) + 'px';});
 				rect.style("height", "20px");
 				
 				rect.style("background-color", (d)=>{return this.color(d.group)});
